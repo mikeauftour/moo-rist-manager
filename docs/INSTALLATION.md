@@ -194,15 +194,15 @@ Im Dashboard sollten nach Verbindungsaufbau **Aktiver RIST-Empfang**, Bitrate un
 3. Unter **Eingabe (Input)** für Server 1 eintragen:
 
    ```text
-   rist://SERVER-IP:5556?cname=irlbox
+   rist://SERVER-IP:5556
    ```
 
-4. Unter **Eingabeformat (Input Format)** `mpegts` eintragen.
-5. Quelle aktivieren und prüfen, ob Bild/Ton ankommen. Für Server 2 statt `5556` den Port `5557` verwenden.
+4. Unter **Eingabeformat (Input Format)** `mpegts` eintragen. Bei der getesteten OBS-Konfiguration waren **Netzwerkpufferung: 1 MB** und **Wiederverbindungsverzögerung: 2 Sekunden** eingestellt. Diese Werte sind Beispiele, keine zwingenden Vorgaben.
+5. Quelle aktivieren und prüfen, ob Bild/Ton ankommen. Die einfache Adresse ohne `?cname=irlbox` wurde in OBS erfolgreich verwendet; ein `cname`-Zusatz ist für dieses Setup nicht erforderlich. Für Server 2 statt `5556` den Port `5557` verwenden.
 
 **Wichtig zur Verschlüsselung:** Der aktuelle Manager startet den Forwarder **ohne RIST-AES-Verschlüsselung/Secret**. Deshalb in OBS **kein** `aes-type` oder `secret` ergänzen. Die offizielle Moo-RIST-Dokumentation empfiehlt für einen *öffentlichen Remote-Relay* grundsätzlich Verschlüsselung zwischen Forwarder und OBS; diese Option ist in dieser Manager-Version noch **nicht implementiert**. Für vertrauliche Inhalte daher ein VPN bzw. eine zusätzlich geschützte Übertragungsstrecke verwenden. Ein Cloudflare-Tunnel für die Manager-Weboberfläche verschlüsselt **nicht** automatisch den RIST-UDP-Verkehr.
 
-**Weitere Streams:** Im Manager immer die tatsächlich angezeigten Ports verwenden. Beispiel: Server 2 → IRLBOX `rist://SERVER-IP:2031`, OBS `rist://SERVER-IP:5557?cname=irlbox`. Für externe Verbindungen die passenden **UDP-Ports in der Anbieter-Firewall** freigeben; siehe den Abschnitt [Firewall und Portfreigaben](#firewall-und-portfreigaben-für-moo-rist-ionos-und-andere-vps).
+**Weitere Streams:** Im Manager immer die tatsächlich angezeigten Ports verwenden. Beispiel: Server 2 → IRLBOX `rist://SERVER-IP:2031`, OBS `rist://SERVER-IP:5557`. Für externe Verbindungen die passenden **UDP-Ports in der Anbieter-Firewall** freigeben; siehe den Abschnitt [Firewall und Portfreigaben](#firewall-und-portfreigaben-für-moo-rist-ionos-und-andere-vps).
 
 **Quelle für OBS-Felder und RIST-Verbindung:** [Offizielle Moo-RIST-Docker-Dokumentation](https://github.com/moo-the-cow/moo-rist-hosting-docker#obs-setup-for-rist). Die hier angegebenen Ports und das derzeit unverschlüsselte Forwarder-Verhalten wurden mit der Konfiguration dieses Managers abgeglichen.
 
