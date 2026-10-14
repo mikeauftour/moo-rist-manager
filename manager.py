@@ -620,7 +620,7 @@ refreshStreams();setInterval(refreshStreams,5000);
                 if path == '/create':
                     name = get('name').strip()
                     if not name or len(name) > 80 or not valid_user(get('user')):
-                        raise ValueError('Ungültige Stream-Daten. RIST-Passwort mindestens 12 Zeichen, nur A-Z, 0-9, _ und -.')
+                        raise ValueError('Ungültige Stream-Daten. RIST-Benutzername nur A-Z, 0-9, _ und -.')
                     sid = s['next_id']
                     pin, pout = 2030 + sid - 1, 5556 + sid - 1
                     if pout > 65535:
