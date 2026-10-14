@@ -187,6 +187,8 @@ Im Dashboard sollten nach Verbindungsaufbau **Aktiver RIST-Empfang**, Bitrate un
 - **RIST-Verschlüsselung und Secret deaktivieren**. Laut Moo-RIST-Dokumentation authentifiziert sich die IRLBOX am Receiver per Benutzername/Passwort ohne zusätzliche RIST-Verschlüsselung.
 - Falls die IRLBOX eine vollständige Ziel-URL statt separater Felder verlangt, lautet die Basisadresse `rist://SERVER-IP:2030`; Zugangsdaten in den dafür vorgesehenen Feldern eintragen. Die genaue Feldbezeichnung hängt von der IRLBOX-Version ab.
 
+**Direkt im Manager:** Bei jedem Stream wird unter den RIST-Zugangsdaten ein vollständiger Sender-Link mit Host, Eingangsport, Benutzername und Passwort vorbereitet. Er ist standardmäßig verborgen und lässt sich über das Augensymbol anzeigen oder mit **Kopieren** übernehmen. Diese URL ist beispielsweise für RIST-fähige Sender-Apps wie **IRL Pro** oder **pocketSRT** gedacht, sofern deren Version die RIST-URL-Parameter unterstützt. Prüfe die Hostadresse besonders beim Zugriff auf den Manager über eine Cloudflare-Tunnel-Domain: Diese ist nicht automatisch als UDP-RIST-Ziel geeignet. Der Link enthält das Passwort und ist vertraulich zu behandeln.
+
 ### RIST-Sender-Apps mit Ziel-Server-URL (z. B. pocketSRT)
 
 Manche mobile Streaming-Apps bieten beim Hinzufügen eines Servers die Felder **Profilname**, **Servertyp**, **Ziel-Server** und **Maximale Bitrate (kbit/s)**, jedoch keine getrennten Eingabefelder für RIST-Benutzername und -Passwort. Wenn die App **RIST Main Profile und EAP-SRP-Authentifizierung** unterstützt, können die Zugangsdaten als URL-Parameter übergeben werden.
