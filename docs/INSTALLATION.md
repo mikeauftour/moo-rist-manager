@@ -174,6 +174,71 @@ Weitere Streams erhalten beispielsweise `2031`/`5557`, `2032`/`5558` usw. In der
 
 Im Dashboard sollten nach Verbindungsaufbau **Aktiver RIST-Empfang**, Bitrate und RTT erscheinen. Die laufenden Container allein beweisen noch keine aktive Übertragung.
 
+
+### Firewall und Portfreigaben für Moo-RIST (IONOS und andere VPS)
+
+**Wichtig:** Die Weboberfläche (TCP 3000) und der eigentliche RIST-Datenverkehr (UDP) sind unabhängig. Damit eine IRLBOX von außen senden kann, muss der jeweilige **UDP-Eingangsport** in der Firewall des Hosting-Anbieters freigegeben sein. Für den RIST-Ausgang zu einem externen Empfänger muss auch dessen verwendeter **UDP-Ausgangs-/Relay-Port** erreichbar sein. Bei einem VPS sind Regeln der Anbieter-Firewall oft zusätzlich zu Linux-Firewall und Docker nötig.
+
+**Ein einzelner Stream:**
+
+| Richtung | Protokoll | Port | Zweck |
+| --- | --- | --- | --- |
+| Eingehend | UDP | `2030` | IRLBOX → Receiver (Server 1) |
+| Eingehend | UDP | `5556` | Empfänger/OBS → RIST-Relay (Server 1), falls verwendet |
+
+**Bis zu 10 Streams vorbereiten (empfohlene Portbereiche bei dieser Portvergabe):**
+
+| Richtung | Protokoll | Portbereich | Zweck |
+| --- | --- | --- | --- |
+| Eingehend | UDP | `2030-2039` | RIST-Eingänge (IRLBOX) |
+| Eingehend | UDP | `5556-5565` | RIST-Ausgänge/Relay für Empfänger |
+
+| Stream | RIST-Eingang UDP | RIST-Ausgang UDP |
+| --- | --- | --- |
+| 1 | 2030 | 5556 |
+| 2 | 2031 | 5557 |
+| 3 | 2032 | 5558 |
+| 4 | 2033 | 5559 |
+| 5 | 2034 | 5560 |
+| 6 | 2035 | 5561 |
+| 7 | 2036 | 5562 |
+| 8 | 2037 | 5563 |
+| 9 | 2038 | 5564 |
+| 10 | 2039 | 5565 |
+
+Die Tabelle zeigt die fortlaufende Standardvergabe. **Maßgeblich sind immer die tatsächlich im Manager angezeigten Ports** – etwa nach dem Löschen oder Neu-Anlegen von Streams.
+
+#### IONOS Cloud Panel: Schritt für Schritt
+
+1. Im **IONOS Cloud Panel** anmelden und unter **Netzwerk → Firewall-Richtlinien** (Bezeichnung kann je nach IONOS-Produkt variieren) die dem Server zugewiesene Richtlinie öffnen.
+2. Bei **eingehenden Regeln** eine Regel mit **Protokoll UDP**, **Portbereich `2030-2039`** und **Aktion Zulassen** erstellen.
+3. Eine weitere eingehende Regel mit **Protokoll UDP**, **Portbereich `5556-5565`** und **Aktion Zulassen** erstellen.
+4. Als Quelle nach Möglichkeit die bekannten öffentlichen IP-Adressen der Encoder bzw. Empfänger einschränken; bei wechselnden mobilen IPs muss die erforderliche Erreichbarkeit berücksichtigt werden.
+5. **Speichern/Übernehmen**, sicherstellen, dass die Firewall-Richtlinie dem richtigen Server zugewiesen ist, und den Aktivierungsstatus kontrollieren. Ein Neustart von Ubuntu/Docker ist für reine Anbieter-Firewall-Regeln normalerweise nicht nötig.
+6. Wenn die neuen Bereichsregeln aktiv sind, können überflüssige gleichwertige Einzelregeln für `2030` und `5556` entfernt werden.
+
+**Andere Hoster:** Sinngemäß dieselben eingehenden UDP-Regeln in der Netzwerk-/Cloud-Firewall des Providers anlegen. Auf einem Heimserver zusätzlich nötige Router-Portweiterleitungen zum Linux-Rechner einrichten.
+
+#### Auf Ubuntu und in Docker prüfen
+
+```bash
+sudo ufw status verbose
+sudo docker ps --format 'table {{.Names}}\t{{.Ports}}'
+sudo ss -lunp | grep -E ':(2030|5556)\\b' || true
+```
+
+Ein inaktives UFW bedeutet **nicht automatisch**, dass keine andere Firewall (z. B. nftables/iptables oder die Anbieter-Firewall) filtert. Docker veröffentlicht nur die Ports **laufender** Streamcontainer. Eine Freigabe eines Portbereichs startet nicht automatisch weitere Streams.
+
+Zum Testen bei **aktiv sendender IRLBOX**:
+
+```bash
+sudo tcpdump -ni any 'udp dst port 2030'
+```
+
+Falls `tcpdump` fehlt: `sudo apt install -y tcpdump`. **0 erfasste Pakete** während eines tatsächlichen Sendeversuchs deuten auf falsche Ziel-IP/Port, fehlende Weiterleitung oder eine vorgelagerte Firewall hin; auch die Encoder-Konfiguration prüfen. Bei sichtbaren Paketen anschließend die RIST-Anmeldedaten und Receiver-Logs kontrollieren.
+
+**Sicherheit:** Nur benötigte UDP-Portbereiche öffnen. **TCP 3000 nicht ungeschützt öffentlich freigeben**: Der Manager kann über Docker weitreichende Host-Rechte ausüben. Für die Verwaltung von außen VPN oder HTTPS mit zusätzlicher Zugangskontrolle verwenden. SSH-Zugang bei Änderungen an Linux-Firewalls unbedingt erhalten.
+
 ## Fertig!
 
 Für Bedienung siehe [BEDIENUNG.md](BEDIENUNG.md), für Updates/Fehler siehe [WARTUNG.md](WARTUNG.md).
