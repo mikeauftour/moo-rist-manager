@@ -391,6 +391,12 @@ def valid_user(v):
     return bool(re.fullmatch(r'[A-Za-z0-9_-]{1,48}', v))
 
 
+def generate_rist_password():
+    # Cryptographically secure; characters are compatible with RIST credentials.
+    alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789_-'
+    return ''.join(secrets.choice(alphabet) for _ in range(20))
+
+
 def valid_password(v):
     return bool(re.fullmatch(r'[A-Za-z0-9_-]{12,100}', v))
 
@@ -483,7 +489,7 @@ class Handler(BaseHTTPRequestHandler):
                         diagnostics.append({'id': stream['id'], 'status': 'Docker-Fehler', 'connection': 'Unbekannt', 'quality': {'rtt_ms': None, 'loss_pct': None, 'quality_source': 'Keine Messdaten'}, 'traffic': {'state': 'Messung nicht verfügbar', 'rate_kbps': None}, 'logs': [], 'error': str(e)[:180]})
                 return self.send_json({'streams': diagnostics})
             if not s['admin']:
-                content = '''<section class="panel"><h2>Ersteinrichtung</h2><p>Ein Administrator und ein fester Hauptstream. Beide Zugangsdaten müssen festgelegt werden.</p><form method="post" action="/setup"><div class="row"><div class="field"><label>Administratorpasswort (mindestens 12 Zeichen)</label><input name="admin" type="password" minlength="12" required></div><div class="field"><label>RIST-Benutzername</label><input name="user" required></div><div class="field"><label>RIST-Passwort (mindestens 12 Zeichen)</label><input name="password" type="password" minlength="12" required></div></div><p class="muted">RIST-Zugangsdaten: nur Buchstaben, Zahlen, _ und -. Administratorpasswort frei wählbar.</p><button>Einrichtung abschließen</button></form></section>'''
+                content = '''<section class="panel"><h2>Ersteinrichtung</h2><p>Ein Administrator und ein fester Hauptstream. Beide Zugangsdaten müssen festgelegt werden.</p><form method="post" action="/setup"><div class="row"><div class="field"><label>Administratorpasswort (mindestens 12 Zeichen)</label><input name="admin" type="password" minlength="12" required></div><div class="field"><label>RIST-Benutzername</label><input name="user" required></div><div class="field"><label>RIST-Passwort</label><p class="muted">Wird beim Abschließen automatisch sicher generiert (20 Zeichen). Nach der Anmeldung über das Augensymbol sichtbar.</p></div></div><p class="muted">RIST-Zugangsdaten: nur Buchstaben, Zahlen, _ und -. Administratorpasswort frei wählbar.</p><button>Einrichtung abschließen</button></form></section>'''
                 return self.send(self.page(content))
             sess = self.session()
             if not sess:
@@ -492,7 +498,7 @@ class Handler(BaseHTTPRequestHandler):
             host = html.escape(self.headers.get('Host', '').split(':')[0], quote=True)
             if not host or not re.fullmatch(r'[A-Za-z0-9.\-:\[\]]+', host):
                 host = 'SERVER-IP'
-            parts = [f'<section class="panel"><h2>Stream hinzufügen</h2><p>Jeder neue Stream erhält automatisch eigene UDP-Ports und zwei Moo-Container.</p><form method="post" action="/create"><input type="hidden" name="csrf" value="{csrf}"><div class="row"><div class="field"><label>Anzeigename</label><input name="name" maxlength="80" required placeholder="Mein Stream"></div><div class="field"><label>RIST-Benutzername</label><input name="user" required></div><div class="field"><label>RIST-Passwort</label><input type="password" name="password" minlength="12" required></div><button>Stream hinzufügen</button></div></form></section><section class="panel"><h2>RIST-Server ({len(s["streams"])})</h2>']
+            parts = [f'<section class="panel"><h2>Stream hinzufügen</h2><p>Jeder neue Stream erhält automatisch eigene UDP-Ports und zwei Moo-Container.</p><form method="post" action="/create"><input type="hidden" name="csrf" value="{csrf}"><div class="row"><div class="field"><label>Anzeigename</label><input name="name" maxlength="80" required placeholder="Mein Stream"></div><div class="field"><label>RIST-Benutzername</label><input name="user" required></div><div class="field"><label>RIST-Passwort</label><p class="muted">Wird beim Anlegen automatisch sicher generiert (20 Zeichen). Danach beim Stream über das Augensymbol anzeigen.</p></div><button>Stream hinzufügen</button></div></form></section><section class="panel"><h2>RIST-Server ({len(s["streams"])})</h2>']
             for stream in s['streams']:
                 sid = stream['id']
                 try:
@@ -576,11 +582,11 @@ refreshStreams();setInterval(refreshStreams,5000);
             path = self.path
             try:
                 if path == '/setup' and not s['admin']:
-                    if len(get('admin')) < 12 or not valid_user(get('user')) or not valid_password(get('password')):
+                    if len(get('admin')) < 12 or not valid_user(get('user')):
                         raise ValueError('Adminpasswort mindestens 12 Zeichen; RIST-Zugangsdaten nur A-Z, 0-9, _ und -, RIST-Passwort mindestens 12 Zeichen.')
                     s['admin'] = password_hash(get('admin'))
                     s['streams'][0]['user'] = get('user')
-                    s['streams'][0]['password'] = get('password')
+                    s['streams'][0]['password'] = generate_rist_password()
                     save(s)
                     return self.redirect()
                 if path == '/login' and s['admin']:
@@ -613,7 +619,7 @@ refreshStreams();setInterval(refreshStreams,5000);
                     return self.redirect('session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0')
                 if path == '/create':
                     name = get('name').strip()
-                    if not name or len(name) > 80 or not valid_user(get('user')) or not valid_password(get('password')):
+                    if not name or len(name) > 80 or not valid_user(get('user')):
                         raise ValueError('Ungültige Stream-Daten. RIST-Passwort mindestens 12 Zeichen, nur A-Z, 0-9, _ und -.')
                     sid = s['next_id']
                     pin, pout = 2030 + sid - 1, 5556 + sid - 1
@@ -624,7 +630,7 @@ refreshStreams();setInterval(refreshStreams,5000);
                         conflict = port_conflict(port)
                         if conflict:
                             raise ValueError(f'UDP-Port {port} bereits belegt: {conflict}')
-                    s['streams'].append({'id': sid, 'name': name, 'user': get('user'), 'password': get('password'), 'in': pin, 'out': pout})
+                    s['streams'].append({'id': sid, 'name': name, 'user': get('user'), 'password': generate_rist_password(), 'in': pin, 'out': pout})
                     s['next_id'] += 1
                     save(s)
                 elif path in ('/start', '/stop', '/delete', '/password', '/edit'):
