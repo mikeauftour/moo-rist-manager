@@ -2,7 +2,9 @@
 
 Ein deutschsprachiger, browserbasierter Manager für mehrere Moo-RIST-Streams auf **einem Linux-Docker-Server**. Mit dunklem Dashboard, automatischer Portvergabe und Live-Statistiken für Bitrate, RTT, Paketverlust und Verbindungsstatus.
 
-> **Wichtig:** Dies ist ein Community-Projekt, keine offizielle Software des Moo-RIST-Teams. Die Anwendung wurde auf einem ZimaBlade mit Moo-RIST 0.0.39 praktisch getestet. Eine breite Kompatibilitätsprüfung auf anderen Linux-Servern steht noch aus.
+> **Wichtig:** Dies ist ein Community-Projekt, keine offizielle Software des Moo-RIST-Teams. Die Anwendung wurde auf einem ZimaBlade mit Moo-RIST 0.0.39 praktisch getestet. Außerdem wurde die Installation auf einem IONOS-VPS mit **Ubuntu 26.04 LTS** erfolgreich durchgeführt; der Manager und zwei RIST-Streamcontainer liefen dort. Eine breite Kompatibilitätsprüfung auf weiteren Linux-Servern steht noch aus.
+>
+> **Erfolgreich getestete IONOS-Konfiguration:** Typ: **Virtuelle Maschine** · Größe: **VPS 1-1-10** · CPU: **1 vCore** · RAM: **1 GB** · Datenträger: **10 GB NVMe SSD** · Betriebssystem: **Ubuntu 26.04 LTS**. Dies bestätigt den grundlegenden Betrieb, nicht eine garantierte Streaming-Leistung unter hoher Last.
 
 ## 🚀 Neu hier? Hier anfangen!
 
