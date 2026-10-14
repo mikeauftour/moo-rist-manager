@@ -156,7 +156,7 @@ Im Browser:
 
 1. Ein **Administratorpasswort** mit mindestens 12 Zeichen festlegen.
 2. Einen **RIST-Benutzernamen** für den Hauptstream wählen.
-3. Ein **RIST-Passwort** mit mindestens 12 Zeichen festlegen.
+3. Das **RIST-Passwort wird automatisch generiert** (20 Zeichen). Nach der Anmeldung kann es beim Stream über das Augensymbol angezeigt und bei Bedarf geändert werden.
 4. Einrichtung abschließen und anmelden. Optional „30 Tage angemeldet bleiben“ aktivieren – nur auf eigenen Geräten.
 
 Die Passwörter sicher verwahren. Keine Passwörter in Screenshots, Support-Tickets oder öffentliche GitHub-Issues kopieren.
