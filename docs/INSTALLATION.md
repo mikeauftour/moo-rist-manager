@@ -175,6 +175,37 @@ Weitere Streams erhalten beispielsweise `2031`/`5557`, `2032`/`5558` usw. In der
 Im Dashboard sollten nach Verbindungsaufbau **Aktiver RIST-Empfang**, Bitrate und RTT erscheinen. Die laufenden Container allein beweisen noch keine aktive Übertragung.
 
 
+
+## IRLBOX und OBS verbinden – Beispiel für Server 1
+
+**Voraussetzung:** Im Manager den gewünschten Stream starten und dessen **Eingangs- und Ausgangsport** ablesen. `SERVER-IP` ist die von IRLBOX/OBS erreichbare IP oder der DNS-Name des RIST-Servers (bei einem VPS die öffentliche IP, nicht `127.0.0.1`).
+
+### IRLBOX (Encoder → Moo-RIST Receiver)
+
+- Als Streaming-Protokoll **RIST** auswählen, soweit die IRLBOX-Oberfläche dies anbietet; Zieladresse/Host: `SERVER-IP`; **UDP-Zielport: `2030`** für Server 1.
+- **RIST Main Profile** verwenden. **Benutzername und Passwort** genau wie beim Stream im Manager hinterlegen.
+- **RIST-Verschlüsselung und Secret deaktivieren**. Laut Moo-RIST-Dokumentation authentifiziert sich die IRLBOX am Receiver per Benutzername/Passwort ohne zusätzliche RIST-Verschlüsselung.
+- Falls die IRLBOX eine vollständige Ziel-URL statt separater Felder verlangt, lautet die Basisadresse `rist://SERVER-IP:2030`; Zugangsdaten in den dafür vorgesehenen Feldern eintragen. Die genaue Feldbezeichnung hängt von der IRLBOX-Version ab.
+
+### OBS Studio (Moo-RIST Relay → OBS)
+
+1. In OBS eine **Medienquelle (Media Source)** hinzufügen.
+2. **„Lokale Datei“ deaktivieren**.
+3. Unter **Eingabe (Input)** für Server 1 eintragen:
+
+   ```text
+   rist://SERVER-IP:5556?cname=irlbox
+   ```
+
+4. Unter **Eingabeformat (Input Format)** `mpegts` eintragen.
+5. Quelle aktivieren und prüfen, ob Bild/Ton ankommen. Für Server 2 statt `5556` den Port `5557` verwenden.
+
+**Wichtig zur Verschlüsselung:** Der aktuelle Manager startet den Forwarder **ohne RIST-AES-Verschlüsselung/Secret**. Deshalb in OBS **kein** `aes-type` oder `secret` ergänzen. Die offizielle Moo-RIST-Dokumentation empfiehlt für einen *öffentlichen Remote-Relay* grundsätzlich Verschlüsselung zwischen Forwarder und OBS; diese Option ist in dieser Manager-Version noch **nicht implementiert**. Für vertrauliche Inhalte daher ein VPN bzw. eine zusätzlich geschützte Übertragungsstrecke verwenden. Ein Cloudflare-Tunnel für die Manager-Weboberfläche verschlüsselt **nicht** automatisch den RIST-UDP-Verkehr.
+
+**Weitere Streams:** Im Manager immer die tatsächlich angezeigten Ports verwenden. Beispiel: Server 2 → IRLBOX `rist://SERVER-IP:2031`, OBS `rist://SERVER-IP:5557?cname=irlbox`. Für externe Verbindungen die passenden **UDP-Ports in der Anbieter-Firewall** freigeben; siehe den Abschnitt [Firewall und Portfreigaben](#firewall-und-portfreigaben-für-moo-rist-ionos-und-andere-vps).
+
+**Quelle für OBS-Felder und RIST-Verbindung:** [Offizielle Moo-RIST-Docker-Dokumentation](https://github.com/moo-the-cow/moo-rist-hosting-docker#obs-setup-for-rist). Die hier angegebenen Ports und das derzeit unverschlüsselte Forwarder-Verhalten wurden mit der Konfiguration dieses Managers abgeglichen.
+
 ### Firewall und Portfreigaben für Moo-RIST (IONOS und andere VPS)
 
 **Wichtig:** Die Weboberfläche (TCP 3000) und der eigentliche RIST-Datenverkehr (UDP) sind unabhängig. Damit eine IRLBOX von außen senden kann, muss der jeweilige **UDP-Eingangsport** in der Firewall des Hosting-Anbieters freigegeben sein. Für den RIST-Ausgang zu einem externen Empfänger muss auch dessen verwendeter **UDP-Ausgangs-/Relay-Port** erreichbar sein. Bei einem VPS sind Regeln der Anbieter-Firewall oft zusätzlich zu Linux-Firewall und Docker nötig.
