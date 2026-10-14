@@ -69,7 +69,7 @@ Einige mobile Sender-Apps bieten statt getrennter Anmeldefelder nur ein Feld **Z
 rist://SERVER-IP:2030?username=RIST-BENUTZERNAME&password=RIST-PASSWORT
 ```
 
-In der App **RIST** als Protokoll wählen; ein Profilname ist frei wählbar und eine maximale Bitrate optional. Für Server 2 den im Manager angezeigten Eingangsport (standardmäßig `2031`) verwenden. **Nicht den OBS-Ausgangsport `5556` als Sendeziel verwenden.** Sonderzeichen in den Zugangsdaten müssen URL-kodiert werden; die vollständige URL enthält ein Passwort und darf nicht öffentlich geteilt werden. **Hinweis:** Die konkrete Kompatibilität mit pocketSRT ist hier noch nicht praktisch bestätigt; die App muss RIST und die erforderliche Authentifizierung unterstützen. Siehe [Installationsanleitung](docs/INSTALLATION.md#rist-sender-apps-mit-ziel-server-url-z-b-pocketsrt).
+In der App **RIST** als Protokoll wählen; ein Profilname ist frei wählbar und eine maximale Bitrate optional. Für Server 2 den im Manager angezeigten Eingangsport (standardmäßig `2031`) verwenden. **Nicht den OBS-Ausgangsport `5556` als Sendeziel verwenden.** Sonderzeichen in den Zugangsdaten müssen URL-kodiert werden; die vollständige URL enthält ein Passwort und darf nicht öffentlich geteilt werden. **Praxistest bestätigt:** pocketSRT funktioniert mit dem generierten RIST-Sender-Link einschließlich Benutzername und Passwort. Andere Apps sind nicht automatisch bestätigt. Siehe [Installationsanleitung](docs/INSTALLATION.md#rist-sender-apps-mit-ziel-server-url-z-b-pocketsrt).
 
 ## Portfreigaben für externe Streams
 
