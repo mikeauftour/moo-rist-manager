@@ -15,7 +15,8 @@ jobs:
     steps:
       - name: Send commit or release to Discord
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          COMMITS_WEBHOOK_URL: ${{ secrets.DISCORD_COMMITS_WEBHOOK_URL }}
           EVENT_NAME: ${{ github.event_name }}
           REPOSITORY: ${{ github.repository }}
         run: |
@@ -23,9 +24,11 @@ jobs:
           import json, os, urllib.request
           from pathlib import Path
 
-          url = os.environ.get("DISCORD_WEBHOOK_URL", "")
+          is_commit = os.environ["EVENT_NAME"] == "push"
+          secret_name = "DISCORD_COMMITS_WEBHOOK_URL" if is_commit else "DISCORD_WEBHOOK_URL"
+          url = os.environ.get("COMMITS_WEBHOOK_URL" if is_commit else "RELEASE_WEBHOOK_URL", "")
           if not url:
-              raise SystemExit("DISCORD_WEBHOOK_URL fehlt. Unter Settings > Secrets and variables > Actions hinterlegen.")
+              raise SystemExit(f"{secret_name} fehlt. Unter Settings > Secrets and variables > Actions hinterlegen.")
           event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
           repo = os.environ["REPOSITORY"]
           if os.environ["EVENT_NAME"] == "push":
