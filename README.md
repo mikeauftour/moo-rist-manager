@@ -10,7 +10,7 @@ Ein deutschsprachiger, browserbasierter Manager für mehrere Moo-RIST-Streams au
 
 **➡️ [Vollständige Schritt-für-Schritt-Installationsanleitung](docs/INSTALLATION.md)**
 
-Die Anleitung erklärt alles von Anfang an: Linux-Voraussetzungen, **Docker Engine**, **Docker Compose v2**, **Python 3**, **Git**, GitHub-Download, Installation, Freigabe im Heimnetz, Ersteinrichtung und IRLBOX-Verbindung.
+Die Anleitung erklärt alles von Anfang an: Linux-Voraussetzungen, **Docker Engine**, **Docker Compose v2**, **Python 3**, **Git**, GitHub-Download, Installation, Einrichtung des Zugriffs im Heimnetz **und auf externen Servern (VPS, z. B. IONOS)**, notwendige Firewall- und UDP-Portfreigaben, Ersteinrichtung und IRLBOX-Verbindung.
 
 **Bereits alles installiert?** Für einen *neuen, leeren* Linux-Docker-Host:
 
