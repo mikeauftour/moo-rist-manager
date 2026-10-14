@@ -18,7 +18,7 @@ cd moo-rist-manager
 sudo bash install.sh install
 ```
 
-`mikeauftour` ist ein Platzhalter und muss nach der Veröffentlichung durch den echten GitHub-Namen ersetzt werden. **Repository:** https://github.com/mikeauftour/moo-rist-manager
+**Repository:** https://github.com/mikeauftour/moo-rist-manager
 
 Die Weboberfläche ist zunächst nur auf `127.0.0.1:3000` erreichbar. Wie du sie sicher im Heimnetz freigibst, steht in der Anleitung.
 
