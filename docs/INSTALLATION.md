@@ -89,7 +89,7 @@ git clone https://github.com/mikeauftour/moo-rist-manager.git
 cd moo-rist-manager
 ```
 
-**`mikeauftour` durch den tatsächlichen Besitzer ersetzen.**  Alternative ohne Git: Auf GitHub **Code → Download ZIP**, ZIP auf den Server übertragen, entpacken und in den entpackten Ordner wechseln.
+Der Repository-Besitzer ist bereits `mikeauftour`; die URL kann unverändert verwendet werden. Alternative ohne Git: Auf GitHub **Code → Download ZIP**, ZIP auf den Server übertragen, entpacken und in den entpackten Ordner wechseln.
 
 ## Schritt 6 – Manager installieren
 
@@ -109,9 +109,13 @@ sudo docker compose ps
 sudo docker compose logs --tail=30 manager
 ```
 
-## Schritt 7 – Weboberfläche im Heimnetz öffnen
+## Schritt 7 – Weboberfläche im Heimnetz oder auf einem externen Server öffnen
 
-**Aus Sicherheitsgründen** lauscht der Manager zunächst nur auf `127.0.0.1:3000`. Wenn du ihn von einem PC im selben Heimnetz öffnen möchtest, trage die **LAN-IP des Linux-Servers** ein:
+**Aus Sicherheitsgründen** lauscht der Manager zunächst nur auf `127.0.0.1:3000`. Das gilt **auch auf einem externen Server (VPS)**: `http://ÖFFENTLICHE-IP:3000` funktioniert mit dieser Standardeinstellung nicht.
+
+**Empfehlung bei externen Servern:** Belasse `MANAGER_BIND_IP=127.0.0.1` und verwende für den Zugriff einen SSH-Tunnel, ein VPN oder eine HTTPS-Domain mit Reverse-Proxy und zusätzlicher Authentisierung/Zugriffsbeschränkung. Einen offenen HTTP-Zugang auf Port 3000 im Internet vermeiden: Der Manager hat Docker-Socket-Zugriff.
+
+**Nur im vertrauenswürdigen Heimnetz:** Wenn du ihn direkt von einem PC im selben Netz öffnen möchtest, trage die **LAN-IP des Linux-Servers** ein:
 
 ```bash
 hostname -I
@@ -140,7 +144,11 @@ Nun im Browser eines Geräts im **gleichen Heimnetz** öffnen:
 http://SERVER-IP:3000
 ```
 
-Ersetze `SERVER-IP` durch deine echte Server-IP. Bei einer Server-IP `192.168.1.50` wäre das `http://192.168.1.50:3000`. Ist die Seite nicht erreichbar, prüfe Server-Firewall, LAN-IP und `sudo docker compose ps`. **Port 3000 nicht öffentlich freigeben!**
+Ersetze `SERVER-IP` durch deine echte Server-IP. Bei einer Server-IP `192.168.1.50` wäre das `http://192.168.1.50:3000`. Ist die Seite nicht erreichbar, prüfe Server-Firewall, LAN-IP und `sudo docker compose ps`. **Port 3000 nicht ungeschützt öffentlich freigeben!**
+
+### Externer IONOS-/VPS-Server
+
+Die Bindung lässt sich über `/opt/moo-rist-single-manager/.env` ändern. `MANAGER_BIND_IP=0.0.0.0` bindet den TCP-Port an alle Netzwerkschnittstellen, **auch an die öffentliche Adresse**. Das ist kein Schutzmechanismus und **keine empfohlene Standardkonfiguration**. Eine Freigabe darf nur hinter geeigneten Netzwerkschutzmaßnahmen erfolgen. Für einen dauerhaften externen Zugang wird eine HTTPS-Domain mit Reverse-Proxy und zusätzlichem Zugriffsschutz oder ein VPN empfohlen. RIST-UDP-Ports werden getrennt von der Manager-Weboberfläche konfiguriert.
 
 ## Schritt 8 – Ersteinrichtung
 
