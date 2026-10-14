@@ -44,6 +44,10 @@ Die Weboberfläche ist standardmäßig nur auf `127.0.0.1:3000` des Servers erre
 
 **Nicht zugesagt:** Installation auf Windows/macOS mit Docker Desktop, alle CPU-Architekturen oder beliebige Linux-Distributionen. Das Moo-RIST-Image muss für die Architektur des Servers verfügbar sein.
 
+## Portfreigaben für externe Streams
+
+Für **10 Streams** in der Cloud-/Provider-Firewall die eingehenden UDP-Bereiche **`2030-2039`** (IRLBOX → Receiver) und **`5556-5565`** (Relay/Empfänger) freigeben. Die tatsächlich verwendeten Ports im Manager kontrollieren. Eine [Schritt-für-Schritt-Anleitung für IONOS und andere Anbieter](docs/INSTALLATION.md#firewall-und-portfreigaben-für-moo-rist-ionos-und-andere-vps) erklärt die Einrichtung und Fehlersuche. **TCP 3000 ist kein RIST-Port und darf nicht ungeschützt öffentlich geöffnet werden.**
+
 ## Sicherheit und Dokumentation
 
 - [Installation für Anfänger](docs/INSTALLATION.md)
