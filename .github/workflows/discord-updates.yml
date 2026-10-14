@@ -1,0 +1,79 @@
+name: Discord Updates
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send commit or release to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PATH: ${{ github.event_path }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+
+          url = os.environ.get("DISCORD_WEBHOOK_URL", "")
+          if not url:
+              raise SystemExit("DISCORD_WEBHOOK_URL fehlt. Unter Settings > Secrets and variables > Actions hinterlegen.")
+          event = json.loads(Path(os.environ["EVENT_PATH"]).read_text())
+          repo = os.environ["REPOSITORY"]
+          if os.environ["EVENT_NAME"] == "push":
+              commits = event.get("commits", [])
+              if not commits:
+                  print("Keine neuen Commits; keine Nachricht.")
+                  raise SystemExit(0)
+              lines = []
+              for commit in commits[-8:]:
+                  sha = commit.get("id", "")[:7]
+                  title = commit.get("message", "").splitlines()[0][:160]
+                  link = commit.get("url", "")
+                  lines.append(f"[`{sha}`]({link}) {title}")
+              extra = len(commits) - len(lines)
+              if extra > 0:
+                  lines.append(f"… und {extra} weitere Commits")
+              payload = {
+                  "username": "Moo-RIST Updates",
+                  "embeds": [{
+                      "title": "🔧 Neue Commits auf main",
+                      "url": event.get("compare") or f"https://github.com/{repo}/commits/main",
+                      "description": "\\n".join(lines)[:4000],
+                      "color": 3447003,
+                      "footer": {"text": repo}
+                  }]
+              }
+          else:
+              release = event.get("release", {})
+              tag = release.get("tag_name", "Neue Version")
+              title = release.get("name") or tag
+              notes = release.get("body") or "Keine Release-Notizen angegeben."
+              payload = {
+                  "username": "Moo-RIST Updates",
+                  "embeds": [{
+                      "title": f"🚀 Release: {title}"[:250],
+                      "url": release.get("html_url", f"https://github.com/{repo}/releases"),
+                      "description": notes[:3900],
+                      "color": 5763719,
+                      "footer": {"text": f"{repo} · {tag}"[:200]}
+                  }]
+              }
+          request = urllib.request.Request(
+              url,
+              data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+              headers={"Content-Type": "application/json", "User-Agent": "Moo-RIST-GitHub-Actions"},
+              method="POST",
+          )
+          with urllib.request.urlopen(request, timeout=20) as response:
+              print(f"Discord-Benachrichtigung gesendet (HTTP {response.status}).")
+          PY
