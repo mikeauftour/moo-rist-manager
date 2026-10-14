@@ -583,7 +583,7 @@ refreshStreams();setInterval(refreshStreams,5000);
             try:
                 if path == '/setup' and not s['admin']:
                     if len(get('admin')) < 12 or not valid_user(get('user')):
-                        raise ValueError('Adminpasswort mindestens 12 Zeichen; RIST-Zugangsdaten nur A-Z, 0-9, _ und -, RIST-Passwort mindestens 12 Zeichen.')
+                        raise ValueError('Adminpasswort mindestens 12 Zeichen; RIST-Benutzername nur A-Z, 0-9, _ und -.')
                     s['admin'] = password_hash(get('admin'))
                     s['streams'][0]['user'] = get('user')
                     s['streams'][0]['password'] = generate_rist_password()
