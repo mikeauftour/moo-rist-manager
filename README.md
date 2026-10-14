@@ -55,8 +55,9 @@ Die Weboberfläche ist standardmäßig nur auf `127.0.0.1:3000` des Servers erre
 | IRLBOX | Protokoll / Ziel | RIST Main Profile · `SERVER-IP:2030` (UDP) |
 | IRLBOX | Anmeldung | RIST-Benutzername und Passwort aus dem Manager; **keine RIST-Verschlüsselung/kein Secret** |
 | OBS Studio | Quelle | **Medienquelle** → „Lokale Datei“ deaktivieren |
-| OBS Studio | Eingabe | `rist://SERVER-IP:5556?cname=irlbox` |
+| OBS Studio | Eingabe | `rist://SERVER-IP:5556` |
 | OBS Studio | Eingabeformat | `mpegts` |
+| OBS Studio | Getestete Zusatzwerte | Netzwerkpufferung `1 MB`, Wiederverbindungsverzögerung `2 Sekunden` |
 
 Für Server 2 gelten die Ports `2031` (IRLBOX) und `5557` (OBS); maßgeblich sind die im Manager angezeigten Ports. **Hinweis:** Der aktuelle Forwarder nutzt noch keine RIST-AES-Verschlüsselung, auch nicht auf externen VPS. Die [ausführliche Anleitung für IRLBOX und OBS](docs/INSTALLATION.md#irlbox-und-obs-verbinden--beispiel-für-server-1) erklärt die Einrichtung und Sicherheitshinweise.
 
