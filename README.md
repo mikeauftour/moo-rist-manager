@@ -60,4 +60,4 @@ Nicht `install` über eine bestehende Installation ausführen! Siehe [Updateanle
 
 ## Lizenz
 
-**Noch nicht festgelegt.** Vor einer öffentlichen Veröffentlichung sollte der Rechteinhaber eine passende Lizenz auswählen und als `LICENSE` hinzufügen. Bis dahin ist die Nutzung und Weitergabe rechtlich nicht automatisch als Open Source freigegeben.
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE). Copyright © 2026 mikeauftour.
