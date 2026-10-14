@@ -421,6 +421,7 @@ STYLE = '''<style>*{box-sizing:border-box}body{margin:0;background:#0d1729;color
 .remember-choice{display:flex;align-items:center;gap:9px;cursor:pointer;color:#dcecff}.remember-choice input{width:auto;accent-color:#439ff9}
 .sender-url{margin:14px 0;padding:12px;border:1px solid #385170;border-radius:10px;background:#12233b}.sender-url .password-wrap{flex-wrap:wrap}.sender-url input{font-family:monospace}.sender-url .muted{margin:8px 0 0}
 .stream-summary{display:flex;align-items:center;gap:14px;cursor:pointer;list-style:none;padding:2px 0}.stream-summary::-webkit-details-marker{display:none}.stream-summary-title{font-size:18px;font-weight:bold;flex:1;min-width:0;overflow-wrap:anywhere}.stream-summary-status{font-weight:bold;font-size:13px;white-space:nowrap}.stream-summary-toggle{font-size:22px;color:#a6c7f7;transition:transform .15s}.stream[open]>.stream-summary .stream-summary-toggle{transform:rotate(180deg)}.stream-body{padding-top:8px}.stream-summary:focus-visible{outline:2px solid #439ff9;outline-offset:5px;border-radius:4px}@media(max-width:650px){.stream-summary{gap:8px}.stream-summary-title{font-size:16px}.stream-summary-status{font-size:12px}}
+.site-footer{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px 22px;text-align:center;margin:30px 0 10px;padding:20px 12px;border-top:1px solid #385170;color:#a6c7f7;font-size:12px;line-height:1.6}.site-footer a{color:#77caff;text-decoration:none}.site-footer a:hover{text-decoration:underline}
 .password-wrap{display:flex;align-items:stretch;gap:6px}.password-wrap input{min-width:0;flex:1}.password-eye{flex:0 0 46px;min-width:46px;padding:8px;background:#233d61;color:#dcecff;border:1px solid #50719a;border-radius:8px;cursor:pointer}.password-eye:hover{background:#30537f}
 </style>'''
 
@@ -475,7 +476,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def page(self, content, message=''):
         notice = f'<div class="error">{html.escape(message)}</div>' if message else ''
-        return '<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RIST Hosting Manager</title>' + STYLE + '<header><b>◉ RIST Hosting Manager</b><span>Single User Edition</span></header><main>' + notice + content + '</main></html>'
+        return '<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RIST Hosting Manager</title>' + STYLE + '<header><b>◉ RIST Hosting Manager</b><span>Single User Edition</span></header><main>' + notice + content + '<footer class="site-footer"><span>Moo-RIST Hosting Manager · Version 1.0.1</span><span>© 2026 <a href="https://github.com/mikeauftour/moo-rist-manager" target="_blank" rel="noopener noreferrer">Mike auf Tour</a> · <a href="https://github.com/mikeauftour/moo-rist-manager" target="_blank" rel="noopener noreferrer">GitHub-Projekt</a></span><span>Basierend auf <a href="https://github.com/moo-the-cow/moo-rist-hosting-docker" target="_blank" rel="noopener noreferrer">Moo-RIST</a> von moo-the-cow · Unabhängiges Community-Projekt</span></footer></main></html>'
 
     def do_GET(self):
         with LOCK:
