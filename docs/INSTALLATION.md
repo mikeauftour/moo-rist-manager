@@ -1,89 +1,171 @@
-# Installation – Schritt für Schritt (Ubuntu/Debian)
+# Installation für Anfänger – von Null bis zum ersten Stream
 
-> **Status:** Der vollständige Installer und Quellcode werden noch veröffentlicht. Diese Anleitung ist bis dahin eine Vorbereitung; den abschließenden Installationsbefehl erst ausführen, wenn `install.sh` im Repository vorhanden ist.
+Diese Anleitung richtet sich an Einsteiger mit einem **neuen Linux-Server** und Terminal-/SSH-Zugang. Die Schritte für Docker gelten für **Ubuntu oder Debian**. Bei anderen Distributionen die offiziellen Docker-Anleitungen verwenden.
 
-## 1. Voraussetzungen
+> **Bereits Docker installiert?** Springe zu [Schritt 4](#schritt-4-versionen-prüfen). **Bestehender Moo-RIST-Manager?** Nicht neu installieren, sondern die [Updateanleitung](WARTUNG.md) lesen.
 
-Ein Linux-Server mit Ubuntu oder Debian, Internetverbindung und einem Benutzer mit `sudo`-Rechten. Alle Befehle im Terminal des Servers ausführen. Für andere Distributionen gelten andere Installationsbefehle.
+## Schritt 1 – Am Server anmelden
 
-## 2. System aktualisieren
+Auf dem Server direkt ein Terminal öffnen oder von einem anderen Computer per SSH verbinden:
 
 ```bash
-sudo apt update
-sudo apt upgrade -y
+ssh BENUTZER@SERVER-IP
 ```
 
-## 3. Docker Engine und Docker Compose v2 installieren
+`BENUTZER` ist dein Linux-Benutzer, `SERVER-IP` die IP des Servers, beispielsweise `192.168.1.50`. Die IP deines Servers erfährst du mit `hostname -I`. Der Beispielwert ist **nicht** die IP, die du übernehmen musst.
 
-Die folgenden Befehle gelten für **Ubuntu**. Für Debian die offizielle Debian-Anleitung verwenden:
-https://docs.docker.com/engine/install/debian/
+## Schritt 2 – Linux-System erkennen und Hilfsprogramme installieren
 
 ```bash
-sudo apt install -y ca-certificates curl
+cat /etc/os-release
+sudo apt update
+sudo apt install -y ca-certificates curl git python3
+```
+
+Falls `sudo` nicht vorhanden ist und du als `root` angemeldet bist, kannst du die Befehle ohne `sudo` ausführen. Die weiteren Beispiele verwenden `sudo`.
+
+## Schritt 3 – Docker Engine und Docker Compose v2 installieren
+
+**Nur auf einem neuen Server ohne vorhandene Docker-Installation durchführen.** Eine bereits funktionierende Docker-Installation mit anderen Projekten nicht entfernen oder überschreiben.
+
+Die folgenden Befehle richten das **offizielle Docker-APT-Repository** ein. Unterstützt werden hier Ubuntu und Debian. Docker empfiehlt den Paketmanager für reguläre Installationen und nicht das schnelle `get.docker.com`-Skript für Produktionsserver.
+
+**3a. Docker-Repository einrichten** (ganzen Block kopieren):
+
+```bash
+set -e
+. /etc/os-release
+case "$ID" in
+  ubuntu) DOCKER_DIST=ubuntu; DOCKER_CODENAME="${UBUNTU_CODENAME:-$VERSION_CODENAME}" ;;
+  debian) DOCKER_DIST=debian; DOCKER_CODENAME="$VERSION_CODENAME" ;;
+  *) echo "Nur Ubuntu oder Debian: gefunden $ID"; exit 1 ;;
+esac
 sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo curl -fsSL "https://download.docker.com/linux/${DOCKER_DIST}/gpg" -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
-sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-Components: stable
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
+printf 'Types: deb\nURIs: https://download.docker.com/linux/%s\nSuites: %s\nComponents: stable\nArchitectures: %s\nSigned-By: /etc/apt/keyrings/docker.asc\n' \
+  "$DOCKER_DIST" "$DOCKER_CODENAME" "$(dpkg --print-architecture)" | sudo tee /etc/apt/sources.list.d/docker.sources
 sudo apt update
+```
+
+Falls `apt` Konflikte mit älteren Docker-Paketen meldet, **nicht blind Pakete entfernen**: zuerst die Hinweise der offiziellen Docker-Dokumentation lesen. Bestehende Docker-Projekte könnten betroffen sein.
+
+**3b. Docker und Compose installieren:**
+
+```bash
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-```
-
-Docker prüfen:
-
-```bash
 sudo systemctl enable --now docker
-sudo docker run --rm hello-world
-docker compose version
 ```
 
-Docker-Dokumentation: https://docs.docker.com/engine/install/ubuntu/
+Compose v2 wird als Plugin installiert. Der richtige Befehl lautet **`docker compose`** mit Leerzeichen, nicht `docker-compose`.
 
-**Hinweis:** `docker compose` mit Leerzeichen ist Compose v2. Das ältere `docker-compose` wird nicht benötigt.
+Offizielle Quellen: [Docker für Ubuntu](https://docs.docker.com/engine/install/ubuntu/), [Docker für Debian](https://docs.docker.com/engine/install/debian/), [Compose-Plugin](https://docs.docker.com/compose/install/linux/).
 
-## 4. Python 3 und Git installieren
+## Schritt 4 – Versionen prüfen
 
 ```bash
-sudo apt install -y python3 git
+sudo docker --version
+sudo docker compose version
 python3 --version
 git --version
+sudo docker info >/dev/null && echo "Docker läuft"
 ```
 
-## 5. Projekt von GitHub herunterladen
+Optionaler Docker-Funktionstest:
 
 ```bash
-git clone https://github.com/mikeauftour/moo-rist-manager.git
-cd moo-rist-manager
-ls -la
+sudo docker run --rm hello-world
 ```
 
-## 6. Manager installieren (erst nach Freigabe des vollständigen Codes)
+Wenn `hello-world` eine Erfolgsmeldung ausgibt, funktioniert Docker. Die Anwendung verwendet Python im Container; **Python 3 auf dem Host** benötigt das Installationsskript für die Vorprüfung.
 
-Wenn die Datei `install.sh` vorhanden ist und der Release als installierbar gekennzeichnet wurde:
+## Schritt 5 – Projekt von GitHub herunterladen
+
+Öffne das veröffentlichte GitHub-Repository. Dort auf den grünen Button **Code → HTTPS** klicken und die URL kopieren. Sie endet auf `.git`.
+
+```bash
+cd ~
+git clone https://github.com/mikeauftour/moo-rist-manager.git
+cd moo-rist-manager
+```
+
+**`mikeauftour` durch den tatsächlichen Besitzer ersetzen.**  Alternative ohne Git: Auf GitHub **Code → Download ZIP**, ZIP auf den Server übertragen, entpacken und in den entpackten Ordner wechseln.
+
+## Schritt 6 – Manager installieren
+
+**Nur für eine Neuinstallation.** Der Standardpfad ist `/opt/moo-rist-single-manager`.
 
 ```bash
 sudo bash install.sh install
 ```
 
-**Nicht auf einer bestehenden Installation mit `install` überschreiben.** Für vorhandene Systeme wird ein separater Upgrade-Weg dokumentiert.
+Das Skript prüft Docker, Compose und Python, legt die Konfiguration an und startet den Manager. Es bricht ab, wenn bereits eine Installation oder Moo-RIST-Streamcontainer erkannt werden.
 
-## 7. Erster Start und Netzwerk
-
-Die Weboberfläche soll aus Sicherheitsgründen zunächst nur lokal erreichbar sein. Die konkrete Adresse und eine optionale Freigabe im Heimnetz werden nach Prüfung des finalen Installers ergänzt. Den Manager-Port niemals direkt ins öffentliche Internet weiterleiten.
-
-Für RIST-Streams müssen die zugewiesenen UDP-Ports erreichbar sein. Router- und Firewallregeln nur für tatsächlich benötigte Ports öffnen.
-
-## 8. Fehlerbehebung
+Prüfen:
 
 ```bash
-sudo docker ps
-docker compose version
-sudo systemctl status docker
+cd /opt/moo-rist-single-manager
+sudo docker compose ps
+sudo docker compose logs --tail=30 manager
 ```
 
-Bei Problemen keine Passwörter, RIST-URLs mit Zugangsdaten oder `.env` öffentlich posten.
+## Schritt 7 – Weboberfläche im Heimnetz öffnen
+
+**Aus Sicherheitsgründen** lauscht der Manager zunächst nur auf `127.0.0.1:3000`. Wenn du ihn von einem PC im selben Heimnetz öffnen möchtest, trage die **LAN-IP des Linux-Servers** ein:
+
+```bash
+hostname -I
+sudo nano /opt/moo-rist-single-manager/.env
+```
+
+Dort zum Beispiel (nur ein Beispiel!):
+
+```ini
+MANAGER_BIND_IP=192.168.1.50
+MANAGER_PORT=3000
+```
+
+In `nano`: `Strg+O`, Enter, `Strg+X` zum Speichern und Schließen.
+
+Dann den **Manager-Service** mit neuer Portbindung erstellen:
+
+```bash
+cd /opt/moo-rist-single-manager
+sudo docker compose up -d --no-deps --force-recreate manager
+```
+
+Nun im Browser eines Geräts im **gleichen Heimnetz** öffnen:
+
+```text
+http://SERVER-IP:3000
+```
+
+Ersetze `SERVER-IP` durch deine echte Server-IP. Bei einer Server-IP `192.168.1.50` wäre das `http://192.168.1.50:3000`. Ist die Seite nicht erreichbar, prüfe Server-Firewall, LAN-IP und `sudo docker compose ps`. **Port 3000 nicht öffentlich freigeben!**
+
+## Schritt 8 – Ersteinrichtung
+
+Im Browser:
+
+1. Ein **Administratorpasswort** mit mindestens 12 Zeichen festlegen.
+2. Einen **RIST-Benutzernamen** für den Hauptstream wählen.
+3. Ein **RIST-Passwort** mit mindestens 12 Zeichen festlegen.
+4. Einrichtung abschließen und anmelden. Optional „30 Tage angemeldet bleiben“ aktivieren – nur auf eigenen Geräten.
+
+Die Passwörter sicher verwahren. Keine Passwörter in Screenshots, Support-Tickets oder öffentliche GitHub-Issues kopieren.
+
+## Schritt 9 – Ersten Stream starten
+
+Im Dashboard **Server 1 – Moo Standard → Starten** klicken. Die Standardports sind:
+
+| Richtung | Protokoll | Port |
+| --- | --- | --- |
+| Eingang IRLBOX → Server | UDP / RIST | `2030` |
+| Ausgang Server → Empfänger | UDP / RIST | `5556` |
+
+Weitere Streams erhalten beispielsweise `2031`/`5557`, `2032`/`5558` usw. In der IRLBOX die **tatsächlich erreichbare Serveradresse** sowie den im Manager festgelegten RIST-Benutzernamen und das Passwort eintragen. **`192.168.x.x` funktioniert nur im passenden LAN/VPN.** Für mobile Übertragung von unterwegs muss der RIST-Eingangsport per VPN oder geeigneter UDP-Portweiterleitung erreichbar sein. Beachte Router, Firewall und öffentliche IPv4-/CGNAT-Situation.
+
+Im Dashboard sollten nach Verbindungsaufbau **Aktiver RIST-Empfang**, Bitrate und RTT erscheinen. Die laufenden Container allein beweisen noch keine aktive Übertragung.
+
+## Fertig!
+
+Für Bedienung siehe [BEDIENUNG.md](BEDIENUNG.md), für Updates/Fehler siehe [WARTUNG.md](WARTUNG.md).

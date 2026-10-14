@@ -1,0 +1,14 @@
+name: moo-rist-single-manager
+services:
+  manager:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${MANAGER_BIND_IP:-127.0.0.1}:${MANAGER_PORT:-3000}:3000/tcp"
+    volumes:
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DATA_FILE: /data/state.json
+    security_opt:
+      - no-new-privileges:true
