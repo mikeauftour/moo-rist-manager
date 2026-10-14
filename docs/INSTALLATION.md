@@ -187,6 +187,25 @@ Im Dashboard sollten nach Verbindungsaufbau **Aktiver RIST-Empfang**, Bitrate un
 - **RIST-Verschlüsselung und Secret deaktivieren**. Laut Moo-RIST-Dokumentation authentifiziert sich die IRLBOX am Receiver per Benutzername/Passwort ohne zusätzliche RIST-Verschlüsselung.
 - Falls die IRLBOX eine vollständige Ziel-URL statt separater Felder verlangt, lautet die Basisadresse `rist://SERVER-IP:2030`; Zugangsdaten in den dafür vorgesehenen Feldern eintragen. Die genaue Feldbezeichnung hängt von der IRLBOX-Version ab.
 
+### RIST-Sender-Apps mit Ziel-Server-URL (z. B. pocketSRT)
+
+Manche mobile Streaming-Apps bieten beim Hinzufügen eines Servers die Felder **Profilname**, **Servertyp**, **Ziel-Server** und **Maximale Bitrate (kbit/s)**, jedoch keine getrennten Eingabefelder für RIST-Benutzername und -Passwort. Wenn die App **RIST Main Profile und EAP-SRP-Authentifizierung** unterstützt, können die Zugangsdaten als URL-Parameter übergeben werden.
+
+| App-Feld | Beispiel für Server 1 |
+| --- | --- |
+| Profilname | `Moo-RIST Server 1` (frei wählbar) |
+| Servertyp | `RIST` |
+| Ziel-Server | Siehe URL unten |
+| Maximale Bitrate (kbit/s) | Optional, z. B. `7000`; abhängig von Encoder und Verbindung |
+
+```text
+rist://SERVER-IP:2030?username=RIST-BENUTZERNAME&password=RIST-PASSWORT
+```
+
+`SERVER-IP` durch die erreichbare Adresse des Moo-RIST-Servers ersetzen; `RIST-BENUTZERNAME` und `RIST-PASSWORT` sind die **Stream-Zugangsdaten** aus dem Manager, **nicht** das Administratorpasswort der Weboberfläche. Für Server 2 den im Dashboard angezeigten Eingangsport verwenden (standardmäßig `2031`). Der Port `5556` ist der **Ausgang für OBS/Empfänger** und nicht das Ziel einer Sender-App.
+
+**Sicherheit und Kompatibilität:** Sonderzeichen wie `&`, `#`, `?` oder `%` in Benutzername/Passwort müssen für URL-Parameter percent-kodiert werden. Da die URL das Passwort im Klartext enthält, niemals in Screenshots, Logs, Chat-Nachrichten oder öffentlichen Issues veröffentlichen. Die App muss die Parameter `username` und `password` tatsächlich an libRIST bzw. den RIST-Verbindungsaufbau weiterreichen. **Die erfolgreiche Verbindung mit pocketSRT wurde für diese Manager-Version noch nicht bestätigt**; das URL-Schema ist ein Konfigurationsbeispiel, keine Kompatibilitätsgarantie. Der aktuelle Manager nutzt keine zusätzliche RIST-AES-Verschlüsselung.
+
 ### OBS Studio (Moo-RIST Relay → OBS)
 
 1. In OBS eine **Medienquelle (Media Source)** hinzufügen.
