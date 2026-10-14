@@ -20,7 +20,7 @@ sudo bash install.sh install
 
 **Repository:** https://github.com/mikeauftour/moo-rist-manager
 
-Die Weboberfläche ist zunächst nur auf `127.0.0.1:3000` erreichbar. Wie du sie sicher im Heimnetz freigibst, steht in der Anleitung.
+Die Weboberfläche ist standardmäßig nur auf `127.0.0.1:3000` des Servers erreichbar. **Das gilt auch für einen externen VPS bei IONOS oder anderen Hostern:** Die öffentliche IP ist damit zunächst nicht erreichbar. Für Zugriff von außerhalb nutze vorzugsweise VPN oder eine HTTPS-Domain mit Reverse-Proxy und zusätzlicher Zugriffskontrolle. Eine bewusste Freigabe per `MANAGER_BIND_IP=0.0.0.0` ist technisch möglich, darf aber nicht als sichere öffentliche Bereitstellung über HTTP verstanden werden. Siehe [Installationsanleitung](docs/INSTALLATION.md).
 
 ## Funktionen
 
