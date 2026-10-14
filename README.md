@@ -61,6 +61,16 @@ Die Weboberfläche ist standardmäßig nur auf `127.0.0.1:3000` des Servers erre
 
 Für Server 2 gelten die Ports `2031` (IRLBOX) und `5557` (OBS); maßgeblich sind die im Manager angezeigten Ports. **Hinweis:** Der aktuelle Forwarder nutzt noch keine RIST-AES-Verschlüsselung, auch nicht auf externen VPS. Die [ausführliche Anleitung für IRLBOX und OBS](docs/INSTALLATION.md#irlbox-und-obs-verbinden--beispiel-für-server-1) erklärt die Einrichtung und Sicherheitshinweise.
 
+### RIST-Sender-Apps mit vollständiger Ziel-URL (z. B. pocketSRT)
+
+Einige mobile Sender-Apps bieten statt getrennter Anmeldefelder nur ein Feld **Ziel-Server / URL**. Wenn die App RIST Main Profile mit EAP-SRP-Anmeldung unterstützt, kann für **Server 1 (Eingang)** dieses URL-Schema verwendet werden:
+
+```text
+rist://SERVER-IP:2030?username=RIST-BENUTZERNAME&password=RIST-PASSWORT
+```
+
+In der App **RIST** als Protokoll wählen; ein Profilname ist frei wählbar und eine maximale Bitrate optional. Für Server 2 den im Manager angezeigten Eingangsport (standardmäßig `2031`) verwenden. **Nicht den OBS-Ausgangsport `5556` als Sendeziel verwenden.** Sonderzeichen in den Zugangsdaten müssen URL-kodiert werden; die vollständige URL enthält ein Passwort und darf nicht öffentlich geteilt werden. **Hinweis:** Die konkrete Kompatibilität mit pocketSRT ist hier noch nicht praktisch bestätigt; die App muss RIST und die erforderliche Authentifizierung unterstützen. Siehe [Installationsanleitung](docs/INSTALLATION.md#rist-sender-apps-mit-ziel-server-url-z-b-pocketsrt).
+
 ## Portfreigaben für externe Streams
 
 Für **10 Streams** in der Cloud-/Provider-Firewall die eingehenden UDP-Bereiche **`2030-2039`** (IRLBOX → Receiver) und **`5556-5565`** (Relay/Empfänger) freigeben. Die tatsächlich verwendeten Ports im Manager kontrollieren. Eine [Schritt-für-Schritt-Anleitung für IONOS und andere Anbieter](docs/INSTALLATION.md#firewall-und-portfreigaben-für-moo-rist-ionos-und-andere-vps) erklärt die Einrichtung und Fehlersuche. **TCP 3000 ist kein RIST-Port und darf nicht ungeschützt öffentlich geöffnet werden.**
